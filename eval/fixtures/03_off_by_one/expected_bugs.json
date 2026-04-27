@@ -1,0 +1,7 @@
+{
+  "bugs": [
+    "off-by-one",
+    "hard range",
+    "difficulty"
+  ]
+}

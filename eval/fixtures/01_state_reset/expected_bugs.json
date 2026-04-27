@@ -1,0 +1,7 @@
+{
+  "bugs": [
+    "secret resets",
+    "session_state",
+    "rerun"
+  ]
+}
