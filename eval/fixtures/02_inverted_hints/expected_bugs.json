@@ -1,8 +1,6 @@
 {
   "bugs": [
     "inverted",
-    "swapped",
-    "higher",
-    "lower"
+    "check_guess"
   ]
 }

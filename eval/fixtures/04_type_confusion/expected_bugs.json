@@ -1,8 +1,6 @@
 {
   "bugs": [
     "type",
-    "string",
-    "cast",
     "str"
   ]
 }
