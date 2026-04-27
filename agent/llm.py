@@ -34,6 +34,7 @@ def call_structured(system: str, prompt: str, max_retries: int = 2) -> dict:
             ],
             response_format={"type": "json_object"},
             temperature=0.2,
+            max_tokens=4096,
         )
         raw = response.choices[0].message.content.strip()
 

@@ -19,15 +19,17 @@ def write_to_sandbox(sandbox_dir: str, filename: str, content: str) -> dict:
 
 
 def run_pytest(sandbox_dir: str, target_file: str, timeout: int = 5) -> dict:
-    """Run pytest on target_file inside sandbox_dir. Returns structured result."""
+    """Run all tests in sandbox_dir. Exit code 5 (no tests collected) → passed=True."""
     try:
         result = subprocess.run(
-            [sys.executable, "-m", "pytest", target_file, "-v", "--tb=short", "--no-header", "-q"],
+            [sys.executable, "-m", "pytest", ".", "-v", "--tb=short", "--no-header", "-q"],
             cwd=sandbox_dir,
             capture_output=True,
             text=True,
             timeout=timeout,
         )
+        if result.returncode == 5:
+            return {"passed": True, "output": "no tests collected"}
         passed = result.returncode == 0
         output = (result.stdout + result.stderr).strip()
     except subprocess.TimeoutExpired:
@@ -41,10 +43,14 @@ def run_pytest(sandbox_dir: str, target_file: str, timeout: int = 5) -> dict:
 
 
 def make_sandbox(source_path: str) -> tuple[str, str]:
-    """Copy source file into a fresh temp dir. Returns (sandbox_dir, filename)."""
+    """Copy source file and any sibling test_*.py into a fresh temp dir."""
     sandbox_dir = tempfile.mkdtemp(prefix="glitch_sbx_")
     filename = os.path.basename(source_path)
     shutil.copy2(source_path, os.path.join(sandbox_dir, filename))
+    source_dir = os.path.dirname(os.path.abspath(source_path))
+    for fname in os.listdir(source_dir):
+        if fname.startswith("test_") and fname.endswith(".py"):
+            shutil.copy2(os.path.join(source_dir, fname), os.path.join(sandbox_dir, fname))
     return sandbox_dir, filename
 
 

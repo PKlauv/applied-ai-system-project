@@ -100,27 +100,33 @@ def investigate(path: str, max_iters: int = MAX_ITERATIONS) -> Generator[dict, N
             iterations: list[IterationResult] = []
             pytest_feedback = ""
             current_code = code
+            _FEEDBACK_MAX = 1500
 
             for iteration in range(1, max_iters + 1):
                 yield {"step": "fix", "message": f"Iteration {iteration}: generating fix..."}
 
-                prompt = (FIX_PROMPT if iteration == 1 else REFLECT_PROMPT)
+                feedback_trimmed = pytest_feedback[-_FEEDBACK_MAX:]
                 if iteration == 1:
                     fmt_prompt = FIX_PROMPT.format(
                         code=current_code,
                         bugs=_bugs_to_text(raw_bugs),
-                        pytest_feedback=pytest_feedback,
+                        pytest_feedback=feedback_trimmed,
                     )
                 else:
                     fmt_prompt = REFLECT_PROMPT.format(
                         code=current_code,
-                        pytest_output=pytest_feedback,
+                        pytest_output=feedback_trimmed,
                         bugs=_bugs_to_text(raw_bugs),
                     )
 
                 logger.log_llm_call("fix" if iteration == 1 else "reflect", fmt_prompt)
-                fix_data = call_structured(SYSTEM_PROMPT, fmt_prompt)
-                fixed_code = fix_data.get("fixed_code", current_code)
+                try:
+                    fix_data = call_structured(SYSTEM_PROMPT, fmt_prompt)
+                    fixed_code = fix_data.get("fixed_code", current_code)
+                except Exception as llm_err:
+                    yield {"step": "fix_error", "message": f"LLM error on iteration {iteration}: {llm_err!r}"}
+                    logger.log_tool_result("llm_error", {"error": repr(llm_err)})
+                    fixed_code = current_code
 
                 # Write fixed code to sandbox
                 logger.log_tool_call("write_to_sandbox", {"filename": filename})
