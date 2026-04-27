@@ -55,7 +55,7 @@ The system has three layers:
 ### Prerequisites
 
 - Python 3.12+
-- A [Google Gemini API key](https://aistudio.google.com/app/apikey) (free tier works for testing; Pro recommended)
+- A free [Groq API key](https://console.groq.com/keys) (no credit card required)
 
 ### Installation
 
@@ -71,7 +71,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env and set GEMINI_API_KEY=your_key_here
+# Edit .env and set GROQ_API_KEY=your_key_here
 ```
 
 ### Run the Streamlit UI
@@ -150,7 +150,7 @@ GUARDRAIL: Only .py files are supported (got: README.md)
 
 | Decision | Choice | Trade-off |
 |---|---|---|
-| LLM | Gemini 2.5 Pro | High quality structured output; costs more tokens than Flash |
+| LLM | Llama 3.3 70B via Groq | Free hosted inference, low latency, capable of structured JSON output. Trade-off: not as strong as frontier closed models on subtle reasoning. |
 | Fix loop | Max 3 iterations | Balances quality vs. latency; most bugs resolve in 1-2 iters |
 | Sandbox | `tempfile` + subprocess | Safe; no `eval`/`exec`; small overhead per run |
 | Scoring | Fuzzy keyword recall | Tolerant of paraphrase; misses highly paraphrased bugs |

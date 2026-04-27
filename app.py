@@ -15,7 +15,7 @@ with st.sidebar:
     st.title("🕵️ Game Glitch Investigator")
     st.caption("An AI agent that finds and fixes bugs in Python code.")
     st.divider()
-    st.markdown("**Model:** Gemini 1.5 Flash")
+    st.markdown("**Model:** Llama 3.3 70B (via Groq)")
     max_iters = st.slider("Max fix iterations", min_value=1, max_value=5, value=3)
     st.divider()
     st.markdown(

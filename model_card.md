@@ -1,6 +1,6 @@
 # Model Card — Game Glitch Investigator Agent
 
-**Model used:** Gemini 1.5 Flash (via `google-genai`)
+**Model used:** Llama 3.3 70B Versatile (via Groq's hosted inference API)
 **Task:** Agentic Python bug investigation and repair
 **Date:** April 2026
 
