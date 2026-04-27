@@ -13,6 +13,7 @@
 - **Training data recency:** Llama 3.3's knowledge of Streamlit APIs may lag behind the latest version. If a bug involves a recently deprecated function, the agent may suggest a fix that uses an equally deprecated pattern.
 - **Over-reporting:** In testing, the agent occasionally flags style issues (variable naming, missing docstrings) as bugs when no guardrail keyword filters these out. This inflates bug counts without adding value.
 - **Language bias:** All prompts are in English. Non-English variable names or comments may reduce analysis quality.
+- **Free-tier token cap:** The Groq free tier allows 100k tokens/day. Expect rate-limit errors after ~10-15 fixture runs in a single day. The UI and CLI both catch this and display a "come back in X minutes" message with a link to upgrade.
 
 ---
 

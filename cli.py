@@ -3,8 +3,11 @@ import argparse
 import json
 import sys
 
+from groq import RateLimitError
+
 from agent.core import investigate
 from agent.guardrails import GuardrailError
+from agent.llm import parse_rate_limit_wait
 from agent.schema import Report
 
 
@@ -83,6 +86,10 @@ def main():
     except GuardrailError as err:
         print(f"GUARDRAIL: {err}", file=sys.stderr)
         sys.exit(1)
+    except RateLimitError as err:
+        wait = parse_rate_limit_wait(err)
+        print(f"RATE LIMIT: Groq daily token cap reached. Come back in {wait}.", file=sys.stderr)
+        sys.exit(2)
     except RuntimeError as err:
         print(f"ERROR: {err}", file=sys.stderr)
         sys.exit(1)

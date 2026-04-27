@@ -5,6 +5,19 @@ import re
 from groq import Groq
 from dotenv import load_dotenv
 
+
+def parse_rate_limit_wait(err: Exception) -> str:
+    """Extract the human-readable wait time from a Groq RateLimitError message."""
+    match = re.search(r"try again in ([\d]+m[\d.]+s|[\d.]+s|[\d]+ \w+)", str(err), re.IGNORECASE)
+    if match:
+        raw = match.group(1)
+        # Convert "19m10.848s" → "19 minutes"
+        m = re.match(r"(\d+)m", raw)
+        if m:
+            return f"{m.group(1)} minutes"
+        return raw
+    return "a few minutes"
+
 load_dotenv()
 
 MODEL_NAME = "llama-3.3-70b-versatile"

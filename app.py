@@ -4,8 +4,11 @@ import tempfile
 
 import streamlit as st
 
+from groq import RateLimitError
+
 from agent.core import investigate
 from agent.guardrails import GuardrailError
+from agent.llm import parse_rate_limit_wait
 from agent.schema import Report
 
 st.set_page_config(page_title="Game Glitch Investigator", page_icon="🕵️", layout="wide")
@@ -82,6 +85,13 @@ if st.button("🔍 Investigate", type="primary"):
         except GuardrailError as err:
             status_area.update(label="Guardrail triggered", state="error")
             st.error(f"**Guardrail:** {err}")
+        except RateLimitError as err:
+            status_area.update(label="Rate limit reached", state="error")
+            wait = parse_rate_limit_wait(err)
+            st.warning(
+                f"**Groq daily token limit reached.** Come back in **{wait}** and try again, "
+                "or upgrade at https://console.groq.com/settings/billing for higher limits."
+            )
 
     finally:
         os.unlink(tmp_path)
