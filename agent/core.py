@@ -7,7 +7,14 @@ from typing import Generator
 from agent.guardrails import validate_input
 from agent.llm import call_structured
 from agent.logger import RunLogger
-from agent.prompts import SYSTEM_PROMPT, PLAN_PROMPT, ANALYZE_PROMPT, FIX_PROMPT, REFLECT_PROMPT
+from agent.prompts import (
+    SYSTEM_PROMPT, PLAN_PROMPT,
+    ANALYZE_PROMPT, ANALYZE_PROMPT_BASELINE,
+    FIX_PROMPT, REFLECT_PROMPT,
+)
+
+# Set FEWSHOT=0 to use the zero-shot baseline for A/B comparison.
+_ANALYZE_PROMPT = ANALYZE_PROMPT_BASELINE if os.environ.get("FEWSHOT") == "0" else ANALYZE_PROMPT
 from agent.schema import BugFinding, IterationResult, Report
 from agent.tools import cleanup_sandbox, make_sandbox, read_file, run_pytest, write_to_sandbox
 
@@ -85,7 +92,7 @@ def investigate(path: str, max_iters: int = MAX_ITERATIONS) -> Generator[dict, N
                 f"{h['id']}. {h['description']} (lines: {h.get('target_lines','?')})"
                 for h in hypotheses
             )
-            analyze_prompt = ANALYZE_PROMPT.format(code=code, hypotheses=hyp_text)
+            analyze_prompt = _ANALYZE_PROMPT.format(code=code, hypotheses=hyp_text)
             logger.log_llm_call("analyze", analyze_prompt)
             analyze_data = call_structured(SYSTEM_PROMPT, analyze_prompt)
             raw_bugs = analyze_data.get("bugs", [])

@@ -4,10 +4,9 @@
 
 ---
 
-## Video Walkthrough
+## Walkthrough
 
-<!-- TODO: Replace with your Loom link after recording -->
-**Loom demo:** _[Add your Loom link here]_
+**Screenshot tour:** [docs/walkthrough.md](docs/walkthrough.md) — covers the Streamlit UI, CLI, guardrail behavior, and the eval harness summary.
 
 ---
 
@@ -157,6 +156,7 @@ GUARDRAIL: Only .py files are supported (got: README.md)
 | Scoring | Fuzzy keyword recall | Tolerant of paraphrase; misses highly paraphrased bugs |
 | UI | Streamlit | Matches original project stack; live streaming via generator |
 | JSON output | Structured schema from prompt | Brittle to model drift; 2-retry parse fallback mitigates |
+| Bug analysis prompt | Few-shot (3 worked examples) | ~300 extra tokens per run; anchors the model on logic bugs only, reducing style false-positives. Toggle off via `FEWSHOT=0` for baseline. See `docs/fewshot_comparison.md`. |
 
 ---
 
@@ -173,7 +173,7 @@ GUARDRAIL: Only .py files are supported (got: README.md)
 | 03_off_by_one | YES | 0.50 | 1.00 | 1 |
 | 04_type_confusion | YES | 0.50 | 0.93 | 1 |
 
-**Reliability findings:** The agent consistently finds the primary bug in each fixture (4/4 pass) but over-reports style issues alongside real bugs, reducing precision. Fixture 03's off-by-one boundary error is caught but the LLM's self-reported confidence on it is 1.00, which highlights that confidence scores reflect self-certainty rather than ground-truth accuracy. The Groq model occasionally fails to produce valid JSON when the fixed code contains triple-quoted docstrings — the try/except fallback prevents harness crashes but means the corrected code isn't written on those iterations.
+**Reliability findings:** The agent consistently finds the primary bug in each fixture (4/4 pass) but over-reports style issues alongside real bugs, reducing precision to ~0.33-0.50. The `ANALYZE_PROMPT` uses 3 worked few-shot examples (inverted comparison, off-by-one, type confusion) to anchor the model on logic bugs only and suppress style false-positives — see `docs/fewshot_comparison.md` for the baseline vs. few-shot breakdown. Fixture 03's off-by-one boundary error is caught but confidence is 1.00, highlighting that confidence reflects self-certainty not ground-truth accuracy. The Groq model fails to produce valid JSON when fixed code contains triple-quoted docstrings — the try/except fallback prevents harness crashes but means the corrected code isn't written on those iterations.
 
 ---
 
