@@ -10,7 +10,7 @@
 
 - **Streamlit-specific blindness:** The agent analyzes code statically. Streamlit bugs that only manifest at runtime (e.g., session state resetting on rerun) require the agent to reason about execution order without running the app. It handles these well for simple cases but can miss interactions between multiple widgets.
 - **Short-context files only:** Files over 100KB are blocked by the guardrail. Very long modules with bugs spread across many functions may confuse the analysis step.
-- **Training data recency:** Gemini's knowledge of Streamlit APIs may lag behind the latest version. If a bug involves a recently deprecated function, the agent may suggest a fix that uses an equally deprecated pattern.
+- **Training data recency:** Llama 3.3's knowledge of Streamlit APIs may lag behind the latest version. If a bug involves a recently deprecated function, the agent may suggest a fix that uses an equally deprecated pattern.
 - **Over-reporting:** In testing, the agent occasionally flags style issues (variable naming, missing docstrings) as bugs when no guardrail keyword filters these out. This inflates bug counts without adding value.
 - **Language bias:** All prompts are in English. Non-English variable names or comments may reduce analysis quality.
 
@@ -26,10 +26,13 @@
 
 ## Surprises During Reliability Testing
 
-> **Fill this in after running `python -m eval.harness`** — describe what surprised you.
+**Harness results (Groq llama-3.3-70b-versatile, 4/4 pass, avg confidence 0.95):**
 
-*Example (replace with real results):*
-> Fixture 03 (off-by-one) was harder than expected. The agent correctly identified the `Hard` difficulty range bug (1-50 vs. 1-200) on every run, but only caught the `>` vs `>=` boundary error about 60% of the time. It seems the LLM treats boundary-condition bugs as lower-salience than obviously misnamed variables. Adding an explicit hypothesis about loop/condition boundaries in the plan prompt might improve recall here.
+**The iteration loop never actually iterated.** Every fixture resolved in exactly 1 iteration. Without real pytest tests bundled into the sandbox, pytest exited with "no tests collected" (exit code 5), which was incorrectly treated as a test failure — burning all 3 iterations on empty reflection cycles. Adding behavioral smoke tests (`test_buggy.py`) to each fixture and treating exit-5 as "no signal" fixed this: the loop now exits after 1 iteration when tests pass.
+
+**Groq fails to produce valid JSON when fixed code contains triple-quoted docstrings.** The `fixed_code` field is a JSON string, but the model adds `"""docstrings"""` to the Python it generates — which breaks JSON encoding at the Groq API level before we even parse it. A prompt instruction to avoid triple quotes in the output largely resolves this, though a more robust fix would be to base64-encode the fixed code.
+
+**The agent over-reports.** On clean helper functions (e.g., `update_score` in fixture 02), the agent flagged missing input validation as "bugs" at 0.90 confidence. These are style/defensive-coding issues, not bugs, which reduces precision without adding value. The fix prompt's "do not add features" instruction partially suppresses this but doesn't eliminate it.
 
 ---
 

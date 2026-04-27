@@ -107,20 +107,21 @@ pytest tests/ -q
 
 **Input:** `eval/fixtures/02_inverted_hints/buggy.py` — `check_guess` returns "Go HIGHER!" when the guess is too high.
 
-**Agent output:**
+**Agent output (real run):**
 ```
-[PLAN]          Reading code and forming investigation plan...
-[PLAN_RESULT]   Found 2 hypothesis(es). Starting analysis.
-[ANALYZE]       Analyzing code against hypotheses...
-[ANALYZE_RESULT] Identified 1 bug(s).
-[FIX]           Iteration 1: generating fix...
-[TEST]          Iteration 1: running tests...
-[TEST_RESULT]   Iteration 1: tests passed.
-[DONE]          Investigation complete. 1 bug(s) found, avg confidence 0.97.
+🔍  [PLAN] Reading code and forming investigation plan...
+📋  [PLAN_RESULT] Found 1 hypothesis(es). Starting analysis.
+🧪  [ANALYZE] Analyzing code against hypotheses...
+🐛  [ANALYZE_RESULT] Identified 3 bug(s).
+🔧  [FIX] Iteration 1: generating fix...
+⚗️  [TEST] Iteration 1: running tests...
+📊  [TEST_RESULT] Iteration 1: tests passed.
+🏁  [DONE] Investigation complete. 3 bug(s) found, avg confidence 0.93.
 
-Bug: [HIGH] inverted comparison in check_guess (line 7, conf=97%)
-     When guess > secret the function returns "Too Low" / "Go HIGHER!" — the
-     labels are swapped. Players are always sent in the wrong direction.
+  1. [MEDIUM] inverted comparison in check_guess (line 6, conf=1.00)
+     The function check_guess returns incorrect hints due to swapped comparison
+     operators. Returns 'Too Low' when guess > secret and 'Too High' when
+     guess < secret — players are always sent in the wrong direction.
 ```
 
 ### Example 2 — Type confusion (`04_type_confusion`)
@@ -129,7 +130,7 @@ Bug: [HIGH] inverted comparison in check_guess (line 7, conf=97%)
 
 **Agent output (abridged):**
 ```
-Bug: [HIGH] secret cast to string on even attempts (line 16, conf=0.95)
+  1. [HIGH] type confusion due to str() conversion on even attempts (line 15, conf=0.95)
      self.secret = str(self.secret) converts the integer secret to a string on
      every even-numbered attempt. The subsequent integer comparison always fails,
      making the game unwinnable every other turn.
@@ -161,20 +162,18 @@ GUARDRAIL: Only .py files are supported (got: README.md)
 
 ## Testing Summary
 
-**Unit tests:** 19 tests across guardrails, logger, tools, and harness scoring — all pass.
+**Unit tests:** 39 tests across guardrails, logger, tools, and harness scoring — all pass.
 
-**Eval harness** (results populated after running `python -m eval.harness` with your API key):
+**Eval harness** (Groq `llama-3.3-70b-versatile`, 4/4 fixtures, avg confidence 0.95):
 
 | Fixture | Pass | Recall | Confidence | Iters |
 |---|---|---|---|---|
-| 01_state_reset | — | — | — | — |
-| 02_inverted_hints | — | — | — | — |
-| 03_off_by_one | — | — | — | — |
-| 04_type_confusion | — | — | — | — |
+| 01_state_reset | YES | 0.50 | 0.93 | 1 |
+| 02_inverted_hints | YES | 1.00 | 0.95 | 1 |
+| 03_off_by_one | YES | 0.50 | 1.00 | 1 |
+| 04_type_confusion | YES | 0.50 | 0.93 | 1 |
 
-> **Note:** Fill in this table after running `python -m eval.harness` once you have your API key set up. Results typically show ≥3/4 fixtures passing with avg confidence 0.85+.
-
-**Reliability findings:** The agent occasionally over-reports style issues as bugs (low precision on clean code) and may miss implicit state bugs in Streamlit-heavy files where it lacks execution context.
+**Reliability findings:** The agent consistently finds the primary bug in each fixture (4/4 pass) but over-reports style issues alongside real bugs, reducing precision. Fixture 03's off-by-one boundary error is caught but the LLM's self-reported confidence on it is 1.00, which highlights that confidence scores reflect self-certainty rather than ground-truth accuracy. The Groq model occasionally fails to produce valid JSON when the fixed code contains triple-quoted docstrings — the try/except fallback prevents harness crashes but means the corrected code isn't written on those iterations.
 
 ---
 
