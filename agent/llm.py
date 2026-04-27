@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL_NAME = "gemini-2.5-pro"
+MODEL_NAME = "gemini-1.5-flash"
 _client = None
 
 
