@@ -15,8 +15,8 @@ pip-wheel-metadata/
 
 # Environment and config
 .env
-.env.*
-*.env
+.env.local
+.env.production
 
 # Streamlit
 .streamlit/secrets.toml
@@ -41,3 +41,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Agent run traces (gitignored; runs/.gitkeep keeps the folder tracked)
+runs/*/
