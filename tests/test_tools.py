@@ -57,3 +57,23 @@ def test_make_sandbox_copies_file(tmpdir):
     sbx, fname = make_sandbox(src)
     assert os.path.isfile(os.path.join(sbx, fname))
     cleanup_sandbox(sbx)
+
+
+def test_make_sandbox_copies_sibling_tests(tmpdir):
+    src = os.path.join(tmpdir, "buggy.py")
+    test_file = os.path.join(tmpdir, "test_buggy.py")
+    with open(src, "w") as f:
+        f.write("pass\n")
+    with open(test_file, "w") as f:
+        f.write("def test_pass():\n    assert True\n")
+    sbx, _ = make_sandbox(src)
+    assert os.path.isfile(os.path.join(sbx, "test_buggy.py"))
+    cleanup_sandbox(sbx)
+
+
+def test_run_pytest_no_tests_returns_passed(tmpdir):
+    with open(os.path.join(tmpdir, "plain.py"), "w") as f:
+        f.write("x = 1\n")
+    result = run_pytest(tmpdir, "plain.py", timeout=10)
+    assert result["passed"] is True
+    assert "no tests" in result["output"]

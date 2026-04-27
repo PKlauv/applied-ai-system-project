@@ -63,6 +63,7 @@ BUGS TO FIX:
 {pytest_feedback}
 
 Return the COMPLETE corrected Python file with all bugs fixed. Do not truncate. Do not add new features.
+IMPORTANT: The fixed_code value must be a valid JSON string. Use single-quoted strings or # comments in the Python code — never triple-quoted strings (\"\"\" or ''') inside fixed_code, as they break JSON encoding.
 
 Respond with JSON only (no markdown fences):
 {{
@@ -85,6 +86,7 @@ KNOWN BUGS:
 {bugs}
 
 Produce a corrected version of the full file. Do not truncate.
+IMPORTANT: fixed_code must be a valid JSON string — use single-quoted strings or # comments, never triple-quoted strings (\"\"\" or ''').
 
 Respond with JSON only (no markdown fences):
 {{
