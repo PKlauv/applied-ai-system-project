@@ -1,0 +1,43 @@
+flowchart TD
+    User([User / .py file]) --> UI
+
+    subgraph Surfaces["Surfaces"]
+        UI[Streamlit UI\napp.py]
+        CLI[CLI\ncli.py]
+    end
+
+    UI --> Core
+    CLI --> Core
+
+    subgraph Agent["Agent Core  ·  agent/core.py"]
+        Core[Orchestrator\nplan → analyze → fix → test → reflect\nmax 3 iterations]
+    end
+
+    Core --> LLM[Gemini 2.5 Pro\nagent/llm.py]
+    Core --> Tools
+
+    subgraph Tools["Tools  ·  agent/tools.py"]
+        T1[read_file]
+        T2[write_to_sandbox]
+        T3[run_pytest\nsubprocess · 5s timeout]
+    end
+
+    Core --> Logger[JSONL Logger\nagent/logger.py\nruns/run_id/trace.jsonl]
+
+    Core --> Report([Report\nbugs · confidence · fixed code · test result])
+
+    Report --> UI
+    Report --> CLI
+
+    subgraph Eval["Eval Harness  ·  eval/harness.py"]
+        Fixtures[4 Fixtures\neval/fixtures/]
+        Harness[Harness\nprecision · recall · avg confidence]
+    end
+
+    Fixtures --> Harness
+    Harness --> Core
+
+    style Agent fill:#dbeafe,stroke:#3b82f6
+    style Surfaces fill:#dcfce7,stroke:#22c55e
+    style Tools fill:#fef9c3,stroke:#eab308
+    style Eval fill:#fce7f3,stroke:#ec4899
