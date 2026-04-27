@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,11 +17,7 @@ def _get_client():
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY not set. Copy .env.example to .env and add your key.")
-        genai.configure(api_key=api_key)
-        _client = genai.GenerativeModel(
-            model_name=MODEL_NAME,
-            system_instruction=None,
-        )
+        _client = genai.Client(api_key=api_key)
     return _client
 
 
@@ -31,7 +27,7 @@ def call_structured(system: str, prompt: str, max_retries: int = 2) -> dict:
     full_prompt = f"{system}\n\n{prompt}"
 
     for attempt in range(max_retries + 1):
-        response = client.generate_content(full_prompt)
+        response = client.models.generate_content(model=MODEL_NAME, contents=full_prompt)
         raw = response.text.strip()
 
         # Strip markdown code fences if Gemini adds them anyway
