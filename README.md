@@ -4,7 +4,9 @@
 
 ---
 
-## Walkthrough
+## Demo Walkthrough
+
+**Loom video:** [Watch the 5-min walkthrough](https://www.loom.com/share/4b30f16ce598499f88ecfa258a453114) — end-to-end run, agent loop, guardrail, and eval harness.
 
 **Screenshot tour:** [docs/walkthrough.md](docs/walkthrough.md) — covers the Streamlit UI, CLI, guardrail behavior, and the eval harness summary.
 
@@ -43,7 +45,7 @@ You get a structured bug report with per-bug confidence, a corrected file, and a
 The system has three layers:
 
 - **Surfaces** (`app.py`, `cli.py`) — accept user input and display results. Both call the same agent core.
-- **Agent Core** (`agent/core.py`) — orchestrates the plan → analyze → fix → test → reflect loop using Gemini 2.5 Pro. Emits live step events for the UI to stream.
+- **Agent Core** (`agent/core.py`) — orchestrates the plan → analyze → fix → test → reflect loop using Llama 3.3 70B via Groq. Emits live step events for the UI to stream.
 - **Tools** (`agent/tools.py`) — file I/O and `pytest` subprocess execution inside a temp sandbox. Every call is logged to a JSONL trace file.
 - **Eval Harness** (`eval/harness.py`) — runs the agent on 4 hand-crafted buggy fixtures (derived from the original Module 1 bugs) and scores precision, recall, and avg confidence.
 
@@ -189,7 +191,7 @@ Building this system made the gap between "AI that generates code" and "AI that 
 ├── agent/
 │   ├── core.py          # Orchestration loop
 │   ├── guardrails.py    # Input validation
-│   ├── llm.py           # Gemini wrapper
+│   ├── llm.py           # Groq LLM wrapper
 │   ├── logger.py        # JSONL run logger
 │   ├── prompts.py       # Prompt templates
 │   ├── schema.py        # Dataclasses

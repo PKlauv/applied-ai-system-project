@@ -36,18 +36,7 @@ explanation of the bug and its impact.
 
 ---
 
-## 4. Decision chain (agent trace)
-
-![Decision chain](../assets/walkthrough/04-trace.png)
-
-Expanding the "Decision chain" panel shows the raw JSONL trace of every event
-the agent logged: `plan`, `llm_call`, `tool_call`, `tool_result`,
-`iteration_end`, `final_report`. This is what reviewers (or future-me) read to
-audit *why* the agent made the call it did.
-
----
-
-## 5. CLI — happy path
+## 4. CLI — happy path
 
 ![CLI happy path](../assets/walkthrough/05-cli-happy.png)
 
@@ -57,7 +46,7 @@ surfaces share the same `investigate()` generator.
 
 ---
 
-## 6. CLI — guardrail rejection
+## 5. CLI — guardrail rejection
 
 ![CLI guardrail](../assets/walkthrough/06-cli-guardrail.png)
 
@@ -68,7 +57,7 @@ API calls.
 
 ---
 
-## 7. Eval harness — 4/4 fixtures pass
+## 6. Eval harness — 4/4 fixtures pass
 
 ![Eval harness](../assets/walkthrough/07-harness.png)
 
