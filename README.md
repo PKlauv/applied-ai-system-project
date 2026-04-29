@@ -6,7 +6,7 @@
 
 ## Demo Walkthrough
 
-**Loom video:** [Watch the 5-min walkthrough](https://www.loom.com/share/4b30f16ce598499f88ecfa258a453114) — end-to-end run, agent loop, guardrail, and eval harness.
+**Loom video:** [Watch the short walkthrough](https://www.loom.com/share/4b30f16ce598499f88ecfa258a453114) — end-to-end run, agent loop, guardrail, and eval harness.
 
 **Screenshot tour:** [docs/walkthrough.md](docs/walkthrough.md) — covers the Streamlit UI, CLI, guardrail behavior, and the eval harness summary.
 
@@ -40,7 +40,6 @@ You get a structured bug report with per-bug confidence, a corrected file, and a
 
 ![System Architecture](assets/architecture.png)
 
-<!-- If the PNG is not yet generated, view the Mermaid source at assets/architecture.mmd -->
 
 The system has three layers:
 
